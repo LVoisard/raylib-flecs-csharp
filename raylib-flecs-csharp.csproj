@@ -24,6 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Maps\**" />
+    <EmbeddedResource Remove="Maps\**" />
+    <None Remove="Maps\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\dagger.png" />
     <None Remove="Resources\ghost.png" />
   </ItemGroup>
 

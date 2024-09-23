@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using Flecs.NET.Core;
+using Raylib_cs;
 
 namespace raylib_flecs_csharp.Components
 {
@@ -14,11 +15,22 @@ namespace raylib_flecs_csharp.Components
 
     public record struct Rotation (float Value);
     public record struct CollisionRadius (float Value);
+    public record struct CollisionRecord (Entity other);
+
+    public record struct Health (float Value, float MaxValue);
+    public record struct Damage (float Value);
+    public record struct TakeDamage(float Value);
+    public record struct TemporaryImmunity(float Value);
+
     public record struct Team (int Value);
 
 
+    public record struct Uses();
+    public record Skill();
+    public record SwordAttack(Texture2D texture, float speed, Position2D pos) : Skill;
+
     // Tag
-    public record struct TakeDamage();
+    public record struct Immovable();
     public record struct PlayerControlled();
     public record struct ComputerControlled();
 }

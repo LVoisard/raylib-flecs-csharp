@@ -28,7 +28,7 @@ namespace raylib_flecs_csharp
         {
             while (!Raylib.WindowShouldClose())
             {
-                world.Progress();
+                world.Progress(Raylib.GetFrameTime());
             }
 
             Raylib.CloseWindow();
