@@ -16,13 +16,13 @@ namespace raylib_flecs_csharp.Routines.PlayerInput
         {
             inputRoutine = world.Entity()
                 .Add(Ecs.Phase)
-                .DependsOn(Ecs.PreUpdate)
-                .ChildOf(Ecs.PreUpdate);
+                .DependsOn(Ecs.OnLoad)
+                .ChildOf(Ecs.OnLoad);
 
             postInputRoutine = world.Entity()
                 .Add(Ecs.Phase)
-                .DependsOn(Ecs.PreUpdate)
-                .ChildOf(Ecs.PreUpdate);
+                .DependsOn(Ecs.OnLoad)
+                .ChildOf(Ecs.OnLoad);
 
         }
 

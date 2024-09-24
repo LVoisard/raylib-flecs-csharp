@@ -7,7 +7,6 @@ namespace raylib_flecs_csharp.Routines.Rendering
 {
     public class RenderRoutines : AbstractRoutineCollection
     {
-        private Entity renderRoutine;
         private Entity preRender;
         private Entity render;
         private Entity postRender;
@@ -15,25 +14,21 @@ namespace raylib_flecs_csharp.Routines.Rendering
 
         protected override void InitRoutinePipeline()
         {
-            renderRoutine = world.Entity("RenderSystem")
-                .Add(Ecs.Phase)
-                .DependsOn(Ecs.PostUpdate)
-                .ChildOf(Ecs.PostUpdate);
 
             preRender = world.Entity("PreRenderPhase")
                 .Add(Ecs.Phase)
-                .DependsOn(renderRoutine)
-                .ChildOf(renderRoutine);            
+                .DependsOn(Ecs.PreStore)
+                .ChildOf(Ecs.PreStore);
 
             render = world.Entity("RenderPhase")
                 .Add(Ecs.Phase)
-                .DependsOn(renderRoutine)
-                .ChildOf(renderRoutine);
+                .DependsOn(Ecs.OnStore)
+                .ChildOf(Ecs.OnStore);
 
             postRender = world.Entity("PostRenderPhase")
                 .Add(Ecs.Phase)
-                .DependsOn(renderRoutine)
-                .ChildOf(renderRoutine);
+                .DependsOn(Ecs.OnStore)
+                .ChildOf(Ecs.OnStore);
         }
 
         protected override void InitRoutines()
@@ -68,6 +63,14 @@ namespace raylib_flecs_csharp.Routines.Rendering
                 .Each((ref Texture2D texture, ref Position2D p) =>
                 {
                     Raylib.DrawTextureEx(texture, new Vector2(p.X, p.Y), 0, 1, Color.White);
+                });
+
+            world.Routine<Texture2D, Position2D, Rotation, Scale>("Draw Objects (Position Rotation & Scale)")
+                .Kind(render)
+                .Without<Color>()
+                .Each((ref Texture2D texture, ref Position2D p, ref Rotation rot, ref Scale scale) =>
+                {
+                    Raylib.DrawTextureEx(texture, new Vector2(p.X, p.Y), rot.Value, scale.Value, Color.White);
                 });
 
             world.Routine("Show FPS")

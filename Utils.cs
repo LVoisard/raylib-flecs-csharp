@@ -20,7 +20,25 @@ namespace raylib_flecs_csharp
         { 
             float x= b.X - a.X;
             float y = b.Y - a.Y;
-            return new Vector2(x, y);
+            var dir = new Vector2(x, y);
+            return dir / dir.Length();
+        }
+
+        public static float GetVectorAngle(Vector2 dir) 
+        { 
+            float a = MathF.Atan2(dir.Y, dir.X);
+
+            return a;
+        }
+
+        public static float DegToRad(float deg)
+        {
+            return deg * MathF.PI / 180.0f;
+        }
+
+        public static float RadToDeg(float rad)
+        {
+            return rad * 180.0f / MathF.PI;
         }
     }
 }

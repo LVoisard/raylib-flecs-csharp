@@ -26,6 +26,7 @@ namespace raylib_flecs_csharp.Routines
         {
 
             world.Routine("Spawner")
+                .Kind(Ecs.OnUpdate)
                 .Interval(0.5f)
                 .Run((Iter it) =>
                 {
@@ -34,6 +35,12 @@ namespace raylib_flecs_csharp.Routines
                     .Set(new Position2D(Raylib.GetRandomValue(0, 1920), Raylib.GetRandomValue(0, 1080)));
                 });
 
+            world.Routine("Delete Entity")
+                .With<ToBeDeleted>()
+                .Kind(Ecs.PreUpdate)
+                .Each(e => {
+                    e.Destruct();    
+                });
         }
     }
 }
