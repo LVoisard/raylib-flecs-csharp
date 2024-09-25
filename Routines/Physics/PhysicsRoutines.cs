@@ -1,6 +1,5 @@
 ﻿using Flecs.NET.Core;
 using raylib_flecs_csharp.Components;
-using System.Collections;
 using System.Numerics;
 
 namespace raylib_flecs_csharp.Routines.Physics
@@ -10,7 +9,9 @@ namespace raylib_flecs_csharp.Routines.Physics
         private Entity physicsPhase;
         private Entity collisionPhase;
         private Entity physicsCleanupPhase;
-        public PhysicsRoutines(World world) : base(world) {
+
+        public PhysicsRoutines(World world) : base(world) 
+        {
         }
 
 
@@ -31,23 +32,29 @@ namespace raylib_flecs_csharp.Routines.Physics
 
         protected override void InitRoutines()
         {
-            world.Routine<Position2D, CollisionRadius, Team>("Detect Collisions")
+            world.Routine<Position2D, CollisionRadius, CollisionFilter>("Detect Collisions")
                 .Kind(collisionPhase)
                 .Immediate()
                 // need to change checking team, should use a collision mask
-                .Each((Entity self, ref Position2D pos, ref CollisionRadius col, ref Team team) =>
+                .Each((Entity self, ref Position2D pos, ref CollisionRadius col, ref CollisionFilter filter) =>
                 {
                     Position2D selfPos = pos;
                     CollisionRadius selfCol = col;
-                    Team selfTeam = team;
+                    CollisionFilter selfFilter = filter;
 
-                    world.Each((Entity other, ref Position2D otherPos, ref CollisionRadius otherCol, ref Team otherTeam) =>
+                    world.Each((Entity other, ref Position2D otherPos, ref CollisionRadius otherCol, ref CollisionFilter otherFilter) =>
                     {
+                        // can't collide with self
                         if (self.Id == other.Id) return;
-                        if (selfTeam == otherTeam) return;
+
+                        // check collision compatibility
+
+                        if (!Physics.Collide(selfFilter, otherFilter)) return;
+
                         if (Utils.DistanceFromTo(selfPos, otherPos) < selfCol.Value + otherCol.Value) {
-                            other.Set<CollisionRecord>(new (self));
-                            self.Set<CollisionRecord>(new (other));
+                            // other.Set<CollisionRecord>(new (self));
+                            //Entity e = world.Entity();
+                            self.Set<CollisionRecord>(new (self, other));
                         }
                     });
 
@@ -63,13 +70,13 @@ namespace raylib_flecs_csharp.Routines.Physics
 
             world.Routine<CollisionRecord>("Collision Detected")
                 .Kind(physicsCleanupPhase)
-                .Each((Entity self, ref CollisionRecord rec) =>
+                .Each((ref CollisionRecord rec) =>
                 {                    
-                    Vector2 dir = Utils.GetDirectionVector(self.Get<Position2D>(), rec.other.Get<Position2D>());
-                    Vector2 offset = dir * (self.Get<CollisionRadius>().Value + rec.other.Get<CollisionRadius>().Value);
+                    Vector2 dir = Utils.GetDirectionVector(rec.self.Get<Position2D>(), rec.other.Get<Position2D>());
+                    Vector2 offset = dir * (rec.self.Get<CollisionRadius>().Value + rec.other.Get<CollisionRadius>().Value);
                     
                     if (!rec.other.Has<Immovable>() && !rec.other.Has<CollisionTrigger>())
-                        rec.other.Set<Position2D>(new (self.Get<Position2D>().X + offset.X, self.Get<Position2D>().Y + offset.Y));   
+                        rec.other.Set<Position2D>(new (rec.self.Get<Position2D>().X + offset.X, rec.self.Get<Position2D>().Y + offset.Y));   
                 });
 
             world.Routine("Collision Cleanup Objects that destroy after colliding")
@@ -88,54 +95,27 @@ namespace raylib_flecs_csharp.Routines.Physics
                 {
                     e.Remove<CollisionRecord>();
                 });
-
-
-        }
-
-        public class Physics 
-        {
-
-            private List<CollisionLayer> collisionLayers = new List<CollisionLayer>();
-
-            private List<BitArray> collisionLayersInteractions = new List<BitArray>();
-
-            public CollisionLayer RegisterCollisionLayer(string name)
-            {
-                if (collisionLayers.Any(x => x.GetName().Equals(name)))
-                    return collisionLayers.First(x => x.GetName().Equals(name));
-
-                var cl = new CollisionLayer(name);
-                collisionLayers.Add(cl);
-
-                foreach (var layer in collisionLayersInteractions) {
-                    layer.Length += 1;
-                    layer[layer.Length] = true;
-                }
-
-                collisionLayersInteractions.Add(new BitArray(collisionLayers.Count));
-                collisionLayersInteractions[collisionLayersInteractions.Count].SetAll(true);
-
-                return cl;
-            }
-
-            public bool CanCollide(CollisionLayer a, CollisionLayer b) 
-            {
-                return collisionLayersInteractions[a.GetID()][b.GetID()];
-            }
-
-            private static int layerIdCount = 0;
-            public struct CollisionLayer {
-                
-                private string name;
-                private int id;
-                public CollisionLayer(string name) {
-                    this.name = name;
-                    this.id = layerIdCount++;
-                }
-
-                public string GetName() { return name; }
-                public int GetID() { return id; }
-            }
-        }
+        }        
     }
+
+    public enum CollisionLayers 
+    {
+        Player = 0x0001,
+        PlayerSpawned = 0x0002,
+        Enemy = 0x0004,
+        EnemySpawned = 0x0008,
+    }
+
+    public static class Physics
+    {
+        public static CollisionFilter PlayerCollisionFilter = new CollisionFilter(CollisionLayers.Player, CollisionLayers.Player | CollisionLayers.Enemy | CollisionLayers.EnemySpawned);
+        public static CollisionFilter PlayerSpawnedCollisionFilter = new CollisionFilter(CollisionLayers.PlayerSpawned, CollisionLayers.Enemy | CollisionLayers.EnemySpawned);
+        public static CollisionFilter EnemyCollisionFilter = new CollisionFilter(CollisionLayers.Enemy, CollisionLayers.Player | CollisionLayers.Enemy | CollisionLayers.PlayerSpawned);
+        public static CollisionFilter EnemySpawnedCollisionFilter = new CollisionFilter(CollisionLayers.EnemySpawned, CollisionLayers.Player | CollisionLayers.PlayerSpawned);
+
+        public static bool Collide(CollisionFilter a, CollisionFilter b)
+        {
+            return (a.collidesWith & b.self) != 0 && (a.self & b.collidesWith) != 0;
+        }
+    }    
 }

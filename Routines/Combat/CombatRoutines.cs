@@ -1,7 +1,6 @@
 ﻿using Flecs.NET.Core;
 using Raylib_cs;
 using raylib_flecs_csharp.Components;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace raylib_flecs_csharp.Routines.Combat
@@ -12,16 +11,17 @@ namespace raylib_flecs_csharp.Routines.Combat
 
         protected override void InitRoutines()
         {
-            world.Routine<CollisionRecord>("Trigger take Damage System")
-                .With<Health>()
+            world.Routine<CollisionRecord, Damage>("Trigger take Damage System")
                 .Kind(Ecs.PostUpdate)
-                .Each((Entity e, ref CollisionRecord rec) =>
+                .Each((Entity e, ref CollisionRecord rec, ref Damage damage) =>
                 {
                     if (e.Get<Team>() == rec.other.Get<Team>()) return;
-                    if (!rec.other.Has<Damage>()) return;
 
-                    if (e.Has<TakeDamage>()) return;
-                    e.Set<TakeDamage>(new(rec.other.Get<Damage>().Value));
+                    float dmg = damage.Value;
+                    if (e.Has<TakeDamage>()) {
+                        dmg += e.Get<TakeDamage>().Value;
+                    }
+                    rec.other.Set<TakeDamage>(new(dmg));
 
                 });
 
@@ -73,9 +73,9 @@ namespace raylib_flecs_csharp.Routines.Combat
 
                     var inst = world.Entity()
                     .IsA(world.Lookup("Dagger Attack"))
-                    .Set<Position2D>(new (pos.X, pos.Y))
-                    .Set<Team>(team);
-
+                    .Set<Position2D>(new(pos.X, pos.Y))
+                    .Set<Team>(team)
+                    .Set<CollisionFilter>(Physics.Physics.PlayerSpawnedCollisionFilter);
 
                     q.Each((ref Position2D pos) => {
                         float dist = Utils.DistanceFromTo(selfPos, pos);
@@ -90,9 +90,6 @@ namespace raylib_flecs_csharp.Routines.Combat
 
                     Vector2 dir = Utils.GetDirectionVector(pos, target);
                     float rotation = Utils.GetVectorAngle(dir);
-                    
-                    Console.WriteLine($"{dir.X} {dir.Y}");
-                    Console.WriteLine(rotation);
 
                     inst.Set<Rotation>(new(Utils.RadToDeg(rotation) + 90))
                         .Set<InputDirection2D>(new (dir.X, dir.Y));

@@ -1,5 +1,6 @@
 ﻿using Flecs.NET.Core;
 using Raylib_cs;
+using raylib_flecs_csharp.Routines.Physics;
 
 namespace raylib_flecs_csharp.Components
 {
@@ -16,7 +17,7 @@ namespace raylib_flecs_csharp.Components
     public record struct Rotation (float Value);
     public record struct CollisionRadius (float Value);
     public record struct CollisionTrigger;
-    public record struct CollisionRecord (Entity other);
+    public record struct CollisionRecord (Entity self, Entity other);
     public record struct DestroyOnCollision;
 
     public record struct Health (float Value, float MaxValue);
@@ -32,4 +33,10 @@ namespace raylib_flecs_csharp.Components
     public record struct PlayerControlled;
     public record struct ComputerControlled;
     public record struct ToBeDeleted;
+    public record struct Projectile;
+
+
+    public record struct Tag(string name);
+
+    public record struct CollisionFilter(CollisionLayers self, CollisionLayers collidesWith);
 }
