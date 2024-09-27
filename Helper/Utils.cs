@@ -6,26 +6,34 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace raylib_flecs_csharp
+namespace raylib_flecs_csharp.Helper
 {
     public static class Utils
     {
-        public static float DistanceFromTo(Position2D a, Position2D b) { 
+        public static float DistanceFromTo(Position2D a, Position2D b)
+        {
             float x = b.X - a.X;
             float y = b.Y - a.Y;
             return MathF.Sqrt(MathF.Pow(x, 2) + MathF.Pow(y, 2));
         }
 
+        public static float DistanceSquaredFromTo(Position2D a, Position2D b)
+        {
+            float x = b.X - a.X;
+            float y = b.Y - a.Y;
+            return MathF.Pow(x, 2) + MathF.Pow(y, 2);
+        }
+
         public static Vector2 GetDirectionVector(Position2D a, Position2D b)
-        { 
-            float x= b.X - a.X;
+        {
+            float x = b.X - a.X;
             float y = b.Y - a.Y;
             var dir = new Vector2(x, y);
             return dir / dir.Length();
         }
 
-        public static float GetVectorAngle(Vector2 dir) 
-        { 
+        public static float GetVectorAngle(Vector2 dir)
+        {
             float a = MathF.Atan2(dir.Y, dir.X);
 
             return a;

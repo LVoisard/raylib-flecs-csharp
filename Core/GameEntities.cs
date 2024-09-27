@@ -1,8 +1,7 @@
 ﻿using Flecs.NET.Core;
 using Raylib_cs;
 using raylib_flecs_csharp.Components;
-using raylib_flecs_csharp.Routines.Physics;
-using System.Collections;
+using raylib_flecs_csharp.Helper;
 
 namespace raylib_flecs_csharp.Core
 {
@@ -37,7 +36,7 @@ namespace raylib_flecs_csharp.Core
                 .Set(new CollisionRadius(16.0f))
                 .Set(new Team(0))
                 .Set(new Health(100, 100))
-                //.Set(new Damage(5))
+                .Set(new Damage(5))
                 .Set<CollisionFilter>(Physics.PlayerCollisionFilter)
                 .Add<Immovable>()
                 .Add<PlayerControlled>();
@@ -46,7 +45,7 @@ namespace raylib_flecs_csharp.Core
                 .Set(new Position2D(0,0))
                 .Set(new InputDirection2D(0,0))
                 .Set(Raylib.LoadTexture("./Resources/ghost.png"))
-                .Set(new Speed(100.0f))
+                .Set(new Speed(50.0f))
                 .Set(new Scale(2.0f))
                 .Set(new CollisionRadius(16.0f))
                 .Set(new Team(1))
@@ -66,11 +65,17 @@ namespace raylib_flecs_csharp.Core
                 .Set<Speed>(new(500))
                 .Set<Components.Range>(new(1000))
                 .Set<CollisionRadius>(new(16.0f))
-                .Add<CollisionTrigger>()
+                .Add<Trigger>()
                 .Set<Position2D>(new(0, 0))
-                .Add<DestroyOnCollision>();
-                
+                .Set<DieAfterSeconds>(new(5f))
+                .Add<DestroyOnTrigger>();
+
+            var worldPartitionContainer = world.Entity("World Partition Container");
+            var worldPartition = world.Prefab("World Partition")
+                .Add<Position2D>();
+
         }
+
 
     }
 }

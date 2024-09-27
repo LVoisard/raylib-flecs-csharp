@@ -10,13 +10,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flecs.NET.Bindings.Debug" Version="4.0.0"  Condition="'$(Configuration)' == 'Debug'" />
-    <PackageReference Include="Flecs.NET.Bindings.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'"/>
-    <PackageReference Include="Flecs.NET.Debug" Version="4.0.0"  Condition="'$(Configuration)' == 'Debug'"/>
-    <PackageReference Include="Flecs.NET.Native.Debug" Version="4.0.0"  Condition="'$(Configuration)' == 'Debug'"/>
-    <PackageReference Include="Flecs.NET.Native.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'"/>
-    <PackageReference Include="Flecs.NET.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'"/>
+    <PackageReference Include="Flecs.NET.Release" Version="4.0.0" />
+    <PackageReference Include="NuGet.CommandLine" Version="6.11.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Raylib-cs" Version="6.1.1" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="Flecs.NET.Native.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Flecs.NET.Bindings.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Flecs.NET.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Flecs.NET.Native.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'" />
+    <PackageReference Include="Flecs.NET.Bindings.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'" />
   </ItemGroup>
 
   <ItemGroup Label="Includes">
@@ -24,12 +29,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Maps\**" />
-    <EmbeddedResource Remove="Maps\**" />
-    <None Remove="Maps\**" />
   </ItemGroup>
 
   <ItemGroup>

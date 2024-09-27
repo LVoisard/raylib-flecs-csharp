@@ -1,18 +1,21 @@
-﻿using Flecs.NET.Core;
-using raylib_flecs_csharp.Components;
+﻿using raylib_flecs_csharp.Components;
 using Raylib_cs;
-using System.Collections.Generic;
+using raylib_flecs_csharp.Helper;
+using Flecs.NET.Core;
+using static Flecs.NET.Core.Ecs;
 
-namespace raylib_flecs_csharp.Routines.PlayerInput
+namespace raylib_flecs_csharp.Systems.PlayerInput
 {
-    public class PlayerInputRoutines : AbstractRoutineCollection
+    public class PlayerInputSystems : AbstractSystemCollection
     {
         private Entity inputRoutine;
         private Entity postInputRoutine;
 
-        public PlayerInputRoutines(World world) : base(world) { }
+        public PlayerInputSystems(World world) : base(world) { 
+        
+        }
 
-        protected override void InitRoutinePipeline()
+        protected override void InitSystemPipeline()
         {
             inputRoutine = world.Entity()
                 .Add(Ecs.Phase)
@@ -26,7 +29,7 @@ namespace raylib_flecs_csharp.Routines.PlayerInput
 
         }
 
-        protected override void InitRoutines()
+        protected override void InitSystems()
         {
             world.Routine("Post Input")
                 .Kind(postInputRoutine)
@@ -65,28 +68,19 @@ namespace raylib_flecs_csharp.Routines.PlayerInput
                 });
 
 
-            world.Routine<InputDirection2D, Position2D>()
-                .With<ComputerControlled>()
+
+            world.Routine<InputDirection2D, Position2D>("Enemy Follow Player")
+                .With<ComputerControlled>()                
                 .Kind(postInputRoutine)
                 .Each((Iter it, int i, ref InputDirection2D dir, ref Position2D pos) => {
-
-                    Position2D p = pos;
-                    Position2D target = new Position2D(float.MaxValue, float.MaxValue);
-
-                    using Query q = world.QueryBuilder<Position2D>().With<PlayerControlled>().Build();
-                    
-                    q.Each((ref Position2D t) =>
-                    {
-                        if (Utils.DistanceFromTo(p, t) < Utils.DistanceFromTo(p, target)) target = t;
-                    });
-
-                    float x = target.X - pos.X;
-                    float y = target.Y - pos.Y;
+                    Entity target = world.Lookup("Player");
+                    if (target == 0) { dir.X = 0; dir.Y = 0; return; }
+                    float x = target.Get<Position2D>().X - pos.X;
+                    float y = target.Get<Position2D>().Y - pos.Y;
                     float l = MathF.Sqrt(MathF.Pow(x, 2) + MathF.Pow(y, 2));
                     dir.X = x / l;
                     dir.Y = y / l;
                 });
-
         }
     }
 }
