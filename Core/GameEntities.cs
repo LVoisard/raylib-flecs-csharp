@@ -7,7 +7,7 @@ namespace raylib_flecs_csharp.Core
 {
     public class GameEntities
     {
-        private World world = null;
+        private World world;
         public GameEntities(World world) 
         {
             this.world = world;
@@ -32,8 +32,8 @@ namespace raylib_flecs_csharp.Core
                 .Set(new InputDirection2D(0, 0))
                 .Set(Raylib.LoadTexture("./Resources/character.png"))
                 .Set(new Speed(200.0f))
-                .Set(new Scale(2.0f))
-                .Set(new CollisionRadius(16.0f))
+                .Set(new Scale(4.0f))
+                .Set(new CollisionRadius(32.0f))
                 .Set(new Team(0))
                 .Set(new Health(100, 100))
                 .Set(new Damage(5))
@@ -46,8 +46,8 @@ namespace raylib_flecs_csharp.Core
                 .Set(new InputDirection2D(0,0))
                 .Set(Raylib.LoadTexture("./Resources/ghost.png"))
                 .Set(new Speed(50.0f))
-                .Set(new Scale(2.0f))
-                .Set(new CollisionRadius(16.0f))
+                .Set(new Scale(4.0f))
+                .Set(new CollisionRadius(32.0f))
                 .Set(new Team(1))
                 .Set(new Health(5, 5))
                 .Set(new Damage(1))
@@ -64,7 +64,7 @@ namespace raylib_flecs_csharp.Core
                 .Set<Scale>(new(2))
                 .Set<Speed>(new(500))
                 .Set<Components.Range>(new(1000))
-                .Set<CollisionRadius>(new(16.0f))
+                .Set<CollisionRadius>(new(32.0f))
                 .Add<Trigger>()
                 .Set<Position2D>(new(0, 0))
                 .Set<DieAfterSeconds>(new(5f))

@@ -54,7 +54,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                 .TickSource(physicsTimer)
                 .Kind(collisionPhase)
                 .MultiThreaded()
-                // need to change checking team, should use a collision mask
+                .Immediate()
                 .Each((Iter it, int i, ref Position2D pos, ref CollisionRadius col, ref CollisionFilter filter) =>
                 {
                     Entity self = it.Entity(i);

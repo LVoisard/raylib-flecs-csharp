@@ -13,8 +13,8 @@ namespace raylib_flecs_csharp.Core
 
         public Game()
         {
+            Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
             Raylib.InitWindow(1920, 1080, "It's Time to Play the Game!");
-
             world = World.Create();
             gameEntities = new GameEntities(world);
             routines = new GameSystems(world);

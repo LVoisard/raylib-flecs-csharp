@@ -11,6 +11,8 @@ namespace raylib_flecs_csharp.Systems.Rendering
         public record struct Render;
         public record struct RenderEnd;
 
+        public record struct On60FPSOrLowerAcheived;
+
         private Entity preRender;
         private Entity render;
         private Entity postRender;
@@ -81,7 +83,7 @@ namespace raylib_flecs_csharp.Systems.Rendering
 
             //    });
 
-            world.Routine("Player ContainedIn Debug")
+            world.Routine("Player Contained In Debug")
                 .With<ContainedIn>(Ecs.Wildcard)
                 .With<PlayerControlled>()
                 .Kind<RenderStart>()
@@ -94,7 +96,22 @@ namespace raylib_flecs_csharp.Systems.Rendering
             world.Routine("Show FPS")
                 .Kind<Render>()
                 .Run((Iter it) => {
-                    Raylib.DrawFPS(20, 20);
+                    Raylib.DrawText($"{Raylib.GetFPS()} FPS", 20, 20, 20, Color.DarkGreen);
+                });
+
+            world.Routine("Show Monster Number")
+                .Kind<Render>()
+                .Run((Iter it) => {
+                    using Query q = world.Query<ComputerControlled>();
+                    Raylib.DrawText($"{q.Count()} Enemies", 20, 40, 20, Color.DarkGreen);
+                });
+
+            world.Routine("Show Entity Number")
+                .Kind<Render>()
+                .Run((Iter it) => {
+                    int c = 0;
+                    world.Children((Entity child) => { c++; });
+                    Raylib.DrawText($"{c} Entities", 20, 60, 20, Color.DarkGreen);
                 });
         }
     }
