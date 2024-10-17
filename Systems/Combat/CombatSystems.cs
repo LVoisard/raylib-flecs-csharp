@@ -45,14 +45,14 @@ namespace raylib_flecs_csharp.Systems.Combat
             world.Observer<DamageTaken>("Add a temporary Immunity to the player after they take damage")
                 .With<PlayerControlled>()
                 .Event(Ecs.OnAdd)
-                .Each((Entity e) =>
+                .Each((Entity e, ref DamageTaken damageTaken) =>
                 {
                     Console.WriteLine("Temporary Immunity Set");
                     e.Set<TemporaryImmunity>(new(0.1f));
                     e.Remove<DamageTaken>();
                 });
 
-            world.Routine<TemporaryImmunity>("Check Immunity and remove when expired ")
+            world.System<TemporaryImmunity>("Check Immunity and remove when expired ")
                 .Kind(Ecs.OnUpdate)
                 .Each((Iter it, int i, ref TemporaryImmunity temporaryImmunity) =>
                 {
@@ -61,7 +61,7 @@ namespace raylib_flecs_csharp.Systems.Combat
                             it.Entity(i).Remove<TemporaryImmunity>();
                 });
 
-            world.Routine<Health, Position2D>("Health bar")
+            world.System<Health, Position2D>("Health bar")
                 .With<PlayerControlled>()
                 .Kind<Rendering.RenderSystems.Render>()
                 .Each((ref Health health, ref Position2D pos) =>
@@ -71,7 +71,7 @@ namespace raylib_flecs_csharp.Systems.Combat
                     Raylib.DrawRectangle((int)(pos.X - 8f), (int)pos.Y - 12, (int)(48.0f * percentHealth), 5, Color.Red);
                 });
 
-            world.Routine<Position2D, Team>("Start Attack")
+            world.System<Position2D, Team>("Start Attack")
                 .With<PlayerControlled>()
                 .Interval(1f)
                 .Each((Entity e, ref Position2D pos, ref Team team) =>

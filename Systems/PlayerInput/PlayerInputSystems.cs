@@ -31,11 +31,11 @@ namespace raylib_flecs_csharp.Systems.PlayerInput
 
         protected override void InitSystems()
         {
-            world.Routine("Post Input")
+            world.System("Post Input")
                 .Kind(postInputRoutine)
                 .Run((Iter it) => { Raylib.PollInputEvents(); });
 
-            world.Routine<InputDirection2D>("Player Input Movement")
+            world.System<InputDirection2D>("Player Input Movement")
                 .Kind(inputRoutine)
                 .With<PlayerControlled>()
                 .Each((ref InputDirection2D dir) =>
@@ -69,7 +69,7 @@ namespace raylib_flecs_csharp.Systems.PlayerInput
 
 
 
-            world.Routine<InputDirection2D, Position2D>("Enemy Follow Player")
+            world.System<InputDirection2D, Position2D>("Enemy Follow Player")
                 .With<ComputerControlled>()                
                 .Kind(postInputRoutine)
                 .Each((Iter it, int i, ref InputDirection2D dir, ref Position2D pos) => {

@@ -45,10 +45,10 @@ namespace raylib_flecs_csharp.Systems.Physics
 
         protected override void InitSystems()
         {
-            QueryBuilder innerQuery = world.QueryBuilder<Position2D, CollisionRadius, CollisionFilter>()
+            QueryBuilder<Position2D, CollisionRadius, CollisionFilter> innerQuery = world.QueryBuilder<Position2D, CollisionRadius, CollisionFilter>()
                .Without<Trigger>();
 
-            world.Routine<Position2D, CollisionRadius, CollisionFilter>("Detect Collisions")
+            world.System<Position2D, CollisionRadius, CollisionFilter>("Detect Collisions")
                 //.With<ContainedIn>(Ecs.Wildcard)
                 .Without<Trigger>()
                 .TickSource(physicsTimer)
@@ -85,7 +85,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                     //foreach (Entity e in neighbourEntities)
                     //    builder.Or().With<ContainedIn>(e);
 
-                    using Query q = builder.Build();
+                    using Query<Position2D, CollisionRadius, CollisionFilter> q = builder.Build();
 
                     q.Each((Entity other, ref Position2D otherPos, ref CollisionRadius otherCol, ref CollisionFilter otherFilter) =>
                     {
@@ -113,7 +113,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                     q.Dispose();
                 });
 
-            world.Routine<Position2D, CollisionRadius, CollisionFilter>("Detect Triggers")
+            world.System<Position2D, CollisionRadius, CollisionFilter>("Detect Triggers")
                 //.With<ContainedIn>(Ecs.Wildcard)
                 .With<Trigger>()
                 .TickSource(physicsTimer)
@@ -129,7 +129,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                     //Entity containedInEntity = it.Pair(3).Second();
 
 
-                    using Query q = world.QueryBuilder<Position2D, CollisionRadius, CollisionFilter>().Build();
+                    using Query<Position2D, CollisionRadius, CollisionFilter> q = world.QueryBuilder<Position2D, CollisionRadius, CollisionFilter>().Build();
                                                                                     //.With<ContainedIn>(containedInEntity).Build();
 
                     q.Each((Entity other, ref Position2D otherPos, ref CollisionRadius otherCol, ref CollisionFilter otherFilter) =>
@@ -152,7 +152,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                 });
 
 
-            world.Routine<Position2D, InputDirection2D, Speed>("Update Positions")
+            world.System<Position2D, InputDirection2D, Speed>("Update Positions")
                 .TickSource(physicsTimer)
                 .Kind(fixedUpdated)
                 .Each((Iter it, int i, ref Position2D pos, ref InputDirection2D dir, ref Speed sp) =>
@@ -162,7 +162,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                     pos.Y += dir.Y * it.DeltaSystemTime() * sp.Value;
                 });
 
-            //world.Routine<Position2D>("Assign collision entities to partitions")
+            //world.System<Position2D>("Assign collision entities to partitions")
             //    .With<CollisionFilter>()
             //    .TickSource(physicsTimer)
             //    .Kind(fixedUpdated)
@@ -197,7 +197,7 @@ namespace raylib_flecs_csharp.Systems.Physics
 
             //    });
 
-            //world.Routine("Partition Cleanup")
+            //world.System("Partition Cleanup")
             //    .With(Ecs.ChildOf, world.Lookup("World Partition Container"))
             //    .TickSource(physicsTimer)
             //    .Kind(Ecs.PreUpdate)
@@ -212,7 +212,7 @@ namespace raylib_flecs_csharp.Systems.Physics
 
             //    });
 
-            world.Routine("Collision Cleanup Objects that destroy after colliding or triggering")
+            world.System("Collision Cleanup Objects that destroy after colliding or triggering")
                 .With<CollidedWith>(Ecs.Wildcard).Or().With<TriggeredWith>(Ecs.Wildcard)
                 .With<DestroyOnCollision>().Or().With<DestroyOnTrigger>()
                 .Kind(Ecs.PreStore)
@@ -221,7 +221,7 @@ namespace raylib_flecs_csharp.Systems.Physics
                     e.Destruct();
                 });
 
-            world.Routine("Collision Cleanup")
+            world.System("Collision Cleanup")
                 .With<CollidedWith>(Ecs.Wildcard)
                 .Kind(Ecs.PreStore)
                 .Each((Entity e) =>

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flecs.NET.Release" Version="4.0.0" />
+    <PackageReference Include="Flecs.NET.Release" Version="4.0.2" />
     <PackageReference Include="NuGet.CommandLine" Version="6.11.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,8 +20,8 @@
     <PackageReference Include="Flecs.NET.Native.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Flecs.NET.Bindings.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Flecs.NET.Debug" Version="4.0.0" Condition="'$(Configuration)' == 'Debug'" />
-    <PackageReference Include="Flecs.NET.Native.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'" />
-    <PackageReference Include="Flecs.NET.Bindings.Release" Version="4.0.0" Condition="'$(Configuration)' == 'Release'" />
+    <PackageReference Include="Flecs.NET.Native.Release" Version="4.0.2" Condition="'$(Configuration)' == 'Release'" />
+    <PackageReference Include="Flecs.NET.Bindings.Release" Version="4.0.2" Condition="'$(Configuration)' == 'Release'" />
   </ItemGroup>
 
   <ItemGroup Label="Includes">

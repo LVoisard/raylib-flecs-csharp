@@ -24,7 +24,7 @@ namespace raylib_flecs_csharp.Systems
         protected override void InitSystems()
         {
 
-            world.Routine("Spawner")
+            world.System("Spawner")
                 .Kind(Ecs.OnUpdate)
                 .Interval(0.05f)
                 .Run((Iter it) =>
@@ -34,7 +34,7 @@ namespace raylib_flecs_csharp.Systems
                     .Set(new Position2D(Raylib.GetRandomValue(0, 1920), Raylib.GetRandomValue(0, 1080)));
                 });
 
-            world.Routine("Delete Entity")
+            world.System("Delete Entity")
                 .With<ToBeDeleted>()
                 .Kind(Ecs.PreUpdate)
                 .Each(e => {
@@ -43,7 +43,7 @@ namespace raylib_flecs_csharp.Systems
 
 
 
-            world.Routine<DieAfterSeconds>("Check DieAfterSeconds and delete when expired ")
+            world.System<DieAfterSeconds>("Check DieAfterSeconds and delete when expired ")
                 .Kind(Ecs.OnUpdate)
                 .Each((Iter it, int i, ref DieAfterSeconds dieTimer) =>
                 {

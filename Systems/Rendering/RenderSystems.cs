@@ -27,20 +27,20 @@ namespace raylib_flecs_csharp.Systems.Rendering
 
         protected override void InitSystems()
         {
-            world.Routine("PreRenderRoutine")
+            world.System("PreRenderRoutine")
                 .Kind<RenderStart>()
                 .Run((Iter it) => { 
                     Raylib.BeginDrawing(); 
                     Raylib.ClearBackground(Color.RayWhite); 
                 });
 
-            world.Routine("PostRenderRoutine")
+            world.System("PostRenderRoutine")
                 .Kind<RenderEnd>()
                 .Run((Iter it) => { 
                     Raylib.EndDrawing(); 
                 });
 
-            world.Routine<Texture2D, Position2D, Scale>("Draw Objects (Position & Scale)")
+            world.System<Texture2D, Position2D, Scale>("Draw Objects (Position & Scale)")
                 .Kind<Render>()
                 .Without<Rotation>()
                 .Without<Color>()
@@ -49,7 +49,7 @@ namespace raylib_flecs_csharp.Systems.Rendering
                     Raylib.DrawTextureEx(texture, new Vector2(p.X, p.Y), 0, s.Value, Color.White);
                 });
 
-            world.Routine<Texture2D, Position2D>("Draw Objects (Position Only)")
+            world.System<Texture2D, Position2D>("Draw Objects (Position Only)")
                 .Kind<Render>()
                 .Without<Scale>()
                 .Without<Rotation>()
@@ -59,7 +59,7 @@ namespace raylib_flecs_csharp.Systems.Rendering
                     Raylib.DrawTextureEx(texture, new Vector2(p.X, p.Y), 0, 1, Color.White);
                 });
 
-            world.Routine<Texture2D, Position2D, Rotation, Scale>("Draw Objects (Position Rotation & Scale)")
+            world.System<Texture2D, Position2D, Rotation, Scale>("Draw Objects (Position Rotation & Scale)")
                 .Kind<Render>()
                 .Without<Color>()
                 .Each((ref Texture2D texture, ref Position2D p, ref Rotation rot, ref Scale scale) =>
@@ -67,7 +67,7 @@ namespace raylib_flecs_csharp.Systems.Rendering
                     Raylib.DrawTextureEx(texture, new Vector2(p.X, p.Y), rot.Value, scale.Value, Color.White);
                 });
 
-            //world.Routine("World Partitionning Debug")
+            //world.System("World Partitionning Debug")
             //    .Kind<RenderStart>()
             //    .Run((Iter it) => {
             //        int width = 1920;
@@ -83,7 +83,7 @@ namespace raylib_flecs_csharp.Systems.Rendering
 
             //    });
 
-            world.Routine("Player Contained In Debug")
+            world.System("Player Contained In Debug")
                 .With<ContainedIn>(Ecs.Wildcard)
                 .With<PlayerControlled>()
                 .Kind<RenderStart>()
@@ -93,20 +93,20 @@ namespace raylib_flecs_csharp.Systems.Rendering
                     Raylib.DrawRectangle((int)pos.X * 64, (int)pos.Y * 64, 64, 64, Color.Green);
                 });
 
-            world.Routine("Show FPS")
+            world.System("Show FPS")
                 .Kind<Render>()
                 .Run((Iter it) => {
                     Raylib.DrawText($"{Raylib.GetFPS()} FPS", 20, 20, 20, Color.DarkGreen);
                 });
 
-            world.Routine("Show Monster Number")
+            world.System("Show Monster Number")
                 .Kind<Render>()
                 .Run((Iter it) => {
-                    using Query q = world.Query<ComputerControlled>();
+                    using Query<ComputerControlled> q = world.Query<ComputerControlled>();
                     Raylib.DrawText($"{q.Count()} Enemies", 20, 40, 20, Color.DarkGreen);
                 });
 
-            world.Routine("Show Entity Number")
+            world.System("Show Entity Number")
                 .Kind<Render>()
                 .Run((Iter it) => {
                     int c = 0;
